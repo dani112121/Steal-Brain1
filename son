@@ -19,7 +19,7 @@ local function visual()
     -- Создаем текст СРАЗУ
     local textLabel = Instance.new("TextLabel")
     textLabel.Size = UDim2.new(1, 0, 1, 0)
-    textLabel.Position = UDim2.new(1, 0, 1, 0)
+    textLabel.Position = UDim2.new(0, 0, 0, 0) -- ИСПРАВЛЕНО: верхний левый угол
     textLabel.BackgroundTransparency = 1
     textLabel.Text = "Прогрузка скрипта 3-5мин!"
     textLabel.TextColor3 = Color3.new(1, 0, 1)
@@ -33,7 +33,7 @@ local function visual()
     local circle = Instance.new("Frame")
     circle.Name = "RotatingCircle"
     circle.Size = UDim2.new(0, 150, 0, 150)
-    circle.Position = UDim2.new(0.5, 1, 0.5, 1)
+    circle.Position = UDim2.new(0.5, -75, 0.5, -75) -- ИСПРАВЛЕНО: центр экрана
     circle.BackgroundColor3 = Color3.new(1, 0, 0)
     circle.BorderSizePixel = 0
     circle.ZIndex = 2
